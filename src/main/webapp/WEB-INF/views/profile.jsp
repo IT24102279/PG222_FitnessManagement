@@ -8,6 +8,7 @@
 </head>
 <body class="p-4">
 <h2 class="text-2xl mb-4">Hi, ${username}!</h2>
+<a href="/update" class="bg-yellow-500 text-white p-2 rounded mr-2">Update Details</a>
 <a href="/login" class="bg-blue-500 text-white p-2 rounded">Logout</a>
 </body>
 </html>
