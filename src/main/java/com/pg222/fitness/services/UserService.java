@@ -3,61 +3,44 @@ package com.pg222.fitness.services;
 import com.pg222.fitness.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 import java.util.List;
 
 @Service
 public class UserService {
+
     @Autowired
     private FileService fileService;
 
-    public String registerUser(User user) {
-        List<User> users = fileService.readUsers();
-        for (User existingUser : users) {
-            if (existingUser.getUsername().equals(user.getUsername())) {
-                return "Username already exists!";
-            }
-        }
-        fileService.appendUser(user);
-        return "Registration successful!";
-    }
-
-    public User login(String username, String password) {
-        List<User> users = fileService.readUsers();
-        for (User user : users) {
-            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
-                return user;
-            }
-        }
-        return null;
-    }
-
-    public User getUserProfile(String username) {
+    public User login(String username, String password) throws IOException {
         List<User> users = fileService.readUsers();
         for (User user : users) {
             if (user.getUsername().equals(username)) {
-                return user;
+                if (user.getPassword().equals(password)) {
+                    return user; // Return full User object
+                } else {
+                    throw new IllegalArgumentException("Incorrect password");
+                }
             }
         }
-        return null;
+        throw new IllegalArgumentException("User not found");
     }
 
-    public String updateUserProfile(User updatedUser) {
+    public void register(User user) throws IOException {
         List<User> users = fileService.readUsers();
-        for (User user : users) {
-            if (user.getUsername().equals(updatedUser.getUsername())) {
-                user.setEmail(updatedUser.getEmail());
-                user.setPassword(updatedUser.getPassword());
-                fileService.writeUsers(users);
-                return "Profile updated successfully!";
+
+        // Check for duplicates
+        for (User existingUser : users) {
+            if (existingUser.getUsername().equals(user.getUsername())) {
+                throw new IllegalArgumentException("Username already registered");
+            }
+            if (existingUser.getEmail().equals(user.getEmail())) {
+                throw new IllegalArgumentException("Email already registered");
             }
         }
-        return "User not found!";
-    }
 
-    public String deleteUser(String username) {
-        List<User> users = fileService.readUsers();
-        users.removeIf(user -> user.getUsername().equals(username));
-        fileService.writeUsers(users);
-        return "User deleted successfully!";
+        // Register new user
+        fileService.appendUser(user);
     }
 }

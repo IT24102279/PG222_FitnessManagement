@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -18,7 +19,11 @@
         <input type="email" name="email" placeholder="Email" class="border p-2 w-full" required/>
     </div>
     <div class="mb-4">
-        <input type="text" name="role" placeholder="Role (e.g., user)" class="border p-2 w-full" required/>
+        <select name="role" class="border p-2 w-full" required>
+            <option value="" disabled selected>Select Role</option>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+        </select>
     </div>
     <button type="submit" class="bg-green-500 text-white p-2 w-full">Register</button>
     <c:if test="${not empty error}">
