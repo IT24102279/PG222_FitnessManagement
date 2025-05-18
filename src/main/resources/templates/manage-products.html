@@ -43,7 +43,7 @@
                          style="height: 50px; width: 50px; object-fit: cover;">
                 </td>
                 <td th:text="${product.name}">Product Name</td>
-                <td th:text="'$' + ${#numbers.formatDecimal(product.price, 0, 2)}">$0.00</td>
+                <td th:text="'Rs ' + ${#numbers.formatDecimal(product.price, 0, 2)}">$0.00</td>
                 <td>
                     <span th:if="${product.available}" class="badge bg-success">In Stock</span>
                     <span th:unless="${product.available}" class="badge bg-danger">Out of Stock</span>

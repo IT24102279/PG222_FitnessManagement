@@ -15,7 +15,7 @@ import java.util.Queue;
 
 @Controller
 @RequestMapping("/admin")
-public class AdminController {
+public class    AdminController {
     @Autowired
     private RequestService requestService;
     @Autowired
