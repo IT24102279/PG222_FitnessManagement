@@ -1,3 +1,4 @@
+
 package pg222.fitness.model;
 
 import java.util.Objects;
