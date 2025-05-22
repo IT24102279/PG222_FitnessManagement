@@ -11,11 +11,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.Queue;
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
-public class    AdminController {
+public class AdminController {
     @Autowired
     private RequestService requestService;
     @Autowired
@@ -27,7 +28,7 @@ public class    AdminController {
         if (user == null || !user.getRole().equals("admin")) return "redirect:/api/users/login";
 
         model.addAttribute("memberships", membershipService.getAllMembershipsSortedByExpiryDate());
-        return "current-memberships"; // Render the new HTML page
+        return "current-memberships";
     }
 
     @GetMapping("/pending-requests")
@@ -35,10 +36,12 @@ public class    AdminController {
         User user = (User) session.getAttribute("user");
         if (user == null || !user.getRole().equals("admin")) return "redirect:/api/users/login";
 
-        Queue<RenewalRequest> pendingRequests = requestService.getPendingRequests();
-        model.addAttribute("requests", pendingRequests);
+        // Get all requests as an array and convert to list for the view
+        RenewalRequest[] requestArray = requestService.getPendingRequests().getAll();
+        List<RenewalRequest> requestList = Arrays.asList(requestArray);
+        model.addAttribute("requests", requestList);
 
-        return "pending-requests"; // Render the new HTML page
+        return "pending-requests";
     }
 
     @GetMapping("/dashboard")
@@ -46,8 +49,9 @@ public class    AdminController {
         User user = (User) session.getAttribute("user");
         if (user == null || !user.getRole().equals("admin")) return "redirect:/api/users/login";
 
-        Queue<RenewalRequest> pendingRequests = requestService.getPendingRequests();
-        model.addAttribute("requests", pendingRequests);
+        RenewalRequest[] requestArray = requestService.getPendingRequests().getAll();
+        List<RenewalRequest> requestList = Arrays.asList(requestArray);
+        model.addAttribute("requests", requestList);
         model.addAttribute("members", membershipService.getAllMembershipsSortedByExpiryDate());
 
         return "admin-dashboard";
