@@ -2,6 +2,7 @@ package pg222.fitness.service;
 
 import pg222.fitness.model.Membership;
 import pg222.fitness.model.RenewalRequest;
+import pg222.fitness.util.RenewalRequestQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,9 +10,7 @@ import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 @Service
 public class RequestService {
@@ -20,13 +19,13 @@ public class RequestService {
     @Autowired
     private MembershipService membershipService;
 
-    private Queue<RenewalRequest> requestQueue = new LinkedList<>();
+    private static final int MAX_QUEUE_SIZE = 100;
+    private final RenewalRequestQueue requestQueue;
 
-    // Constructor is now empty
     public RequestService() {
+        this.requestQueue = new RenewalRequestQueue(MAX_QUEUE_SIZE);
     }
 
-    // Initialization logic moved to @PostConstruct
     @PostConstruct
     public void init() {
         try {
@@ -43,7 +42,7 @@ public class RequestService {
             if (parts[3].equals("pending")) {
                 RenewalRequest request = new RenewalRequest(
                         Integer.parseInt(parts[0]), parts[1], parts[2], parts[3], Integer.parseInt(parts[4]));
-                requestQueue.offer(request);
+                requestQueue.insert(request);
             }
         }
     }
@@ -54,15 +53,18 @@ public class RequestService {
         String requestDate = LocalDate.now().toString();
         RenewalRequest request = new RenewalRequest(requestId, username, requestDate, "pending", tierId);
         fileService.appendToFile("requests.txt", request.toString());
-        requestQueue.offer(request);
+        requestQueue.insert(request);
     }
 
-    public Queue<RenewalRequest> getPendingRequests() {
+    public RenewalRequestQueue getPendingRequests() {
         return requestQueue;
     }
 
     public RenewalRequest processNextRequest() throws IOException {
-        RenewalRequest request = requestQueue.poll();
+        if (requestQueue.isEmpty()) {
+            return null;
+        }
+        RenewalRequest request = requestQueue.remove();
         if (request != null) {
             updateRequestStatus(request.getRequestId(), "processed");
         }
@@ -70,18 +72,22 @@ public class RequestService {
     }
 
     public void approveRequest(int requestId) throws IOException {
+        RenewalRequestQueue tempQueue = new RenewalRequestQueue(MAX_QUEUE_SIZE);
         RenewalRequest request = null;
-        Queue<RenewalRequest> tempQueue = new LinkedList<>();
+
         while (!requestQueue.isEmpty()) {
-            RenewalRequest r = requestQueue.poll();
+            RenewalRequest r = requestQueue.remove();
             if (r.getRequestId() == requestId) {
                 request = r;
-                break;
             } else {
-                tempQueue.offer(r);
+                tempQueue.insert(r);
             }
         }
-        requestQueue.addAll(tempQueue);
+
+        // Restore the remaining requests back to the original queue
+        while (!tempQueue.isEmpty()) {
+            requestQueue.insert(tempQueue.remove());
+        }
 
         if (request != null) {
             updateRequestStatus(requestId, "approved");
