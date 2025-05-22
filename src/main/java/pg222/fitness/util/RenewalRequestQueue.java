@@ -16,3 +16,16 @@ public class RenewalRequestQueue {
         rear = -1;
         nItems = 0;
     }
+
+    public void insert(RenewalRequest req) {
+        if (isFull()) {
+            System.out.println("Queue is full");
+        } else {
+            if (rear == maxSize - 1) {  // Deal with wraparound
+                rear = -1;
+            }
+            queueArray[++rear] = req;
+            nItems++;
+        }
+    }
+}
