@@ -42,3 +42,39 @@ public class RenewalRequestQueue {
             return temp;
         }
     }
+
+    public RenewalRequest peekFront() {
+        if (isEmpty()) {
+            System.out.println("Queue is empty");
+            return null;
+        } else {
+            return queueArray[front];
+        }
+    }
+
+    public boolean isEmpty() {
+        return (nItems == 0);
+    }
+
+    public boolean isFull() {
+        return (nItems == maxSize);
+    }
+
+    public int size() {
+        return nItems;
+    }
+
+    // Added to help with displaying all items
+    public RenewalRequest[] getAll() {
+        RenewalRequest[] result = new RenewalRequest[nItems];
+        int index = 0;
+        int current = front;
+
+        while (index < nItems) {
+            result[index++] = queueArray[current];
+            current = (current + 1) % maxSize;
+        }
+
+        return result;
+    }
+}
