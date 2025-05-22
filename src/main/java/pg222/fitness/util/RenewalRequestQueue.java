@@ -28,4 +28,17 @@ public class RenewalRequestQueue {
             nItems++;
         }
     }
-}
+
+    public RenewalRequest remove() {
+        if (isEmpty()) {
+            System.out.println("Queue is empty");
+            return null;
+        } else {
+            RenewalRequest temp = queueArray[front++];
+            if (front == maxSize) {  // Deal with wraparound
+                front = 0;
+            }
+            nItems--;
+            return temp;
+        }
+    }
