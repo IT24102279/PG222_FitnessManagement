@@ -2,7 +2,6 @@ package pg222.fitness.service;
 
 import pg222.fitness.model.Membership;
 import pg222.fitness.model.RenewalRequest;
-import pg222.fitness.util.RenewalRequestQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +11,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+//import Team implemented Queue
+import pg222.fitness.util.RenewalRequestQueue;
+
 @Service
 public class RequestService {
     @Autowired
@@ -19,6 +21,7 @@ public class RequestService {
     @Autowired
     private MembershipService membershipService;
 
+    //create queue
     private static final int MAX_QUEUE_SIZE = 100;
     private final RenewalRequestQueue requestQueue;
 
@@ -34,7 +37,7 @@ public class RequestService {
             e.printStackTrace();
         }
     }
-
+//queue usage
     private void loadRequestsIntoQueue() throws IOException {
         List<String> lines = fileService.readFile("requests.txt");
         for (String line : lines) {

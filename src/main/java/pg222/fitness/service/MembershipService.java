@@ -10,10 +10,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class MembershipService {
@@ -49,7 +45,7 @@ public class MembershipService {
         }
         fileService.writeFile("memberships.txt", updatedLines);
     }
-
+//Usage of Insertion sort to sort the memberships
     public List<Membership> getAllMembershipsSortedByExpiryDate() throws IOException {
         List<Membership> memberships = new ArrayList<>();
         List<String> lines = fileService.readFile("memberships.txt");
@@ -60,7 +56,7 @@ public class MembershipService {
         insertionSortByExpiryDate(memberships);
         return memberships;
     }
-
+//implementation of insertion sort to be used by the above function
     private void insertionSortByExpiryDate(List<Membership> memberships) {
         for (int i = 1; i < memberships.size(); i++) {
             Membership key = memberships.get(i);
